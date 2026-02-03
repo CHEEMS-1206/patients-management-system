@@ -1,0 +1,70 @@
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# =========================
+# Java / Build tools
+# =========================
+target/
+build/
+*.class
+*.jar
+*.war
+*.ear
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# OS generated files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+application-*.yml
+application-*.properties
+
+# =========================
+# Temporary / Misc
+# =========================
+tmp/
+temp/
+*.swp
+*.bak
+
+# =========================
+# Node (if React frontend exists)
+# =========================
+node_modules/
+dist/
+build/
+
+# =========================
+# Docker
+# =========================
+*.pid
+docker-compose.override.yml
+
+# =========================
+# Test & coverage
+# =========================
+coverage/
+*.exec
+
+# =========================
+# Personal file
+# =========================
+route-map.txt
