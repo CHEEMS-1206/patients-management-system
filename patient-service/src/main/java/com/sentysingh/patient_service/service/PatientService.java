@@ -1,5 +1,6 @@
 package com.sentysingh.patient_service.service;
 
+import com.sentysingh.patient_service.dto.PatientRequestDTO;
 import com.sentysingh.patient_service.mapper.PatientMapper;
 import com.sentysingh.patient_service.model.Patient;
 import com.sentysingh.patient_service.dto.PatientResponseDTO;
@@ -23,5 +24,11 @@ public class PatientService {
         List<PatientResponseDTO> patientResponseDTOS = patients.stream()
                 .map(patient -> PatientMapper.toDTO(patient)).toList();
         return patientResponseDTOS;
+    }
+
+    // service layer passing model to repository after converting DTO to model
+    public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO) {
+        Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
+        return PatientMapper.toDTO(newPatient);
     }
 }
