@@ -1,6 +1,7 @@
 package com.sentysingh.patient_service.service;
 
 import com.sentysingh.patient_service.dto.PatientRequestDTO;
+import com.sentysingh.patient_service.exception.EmailAlreadyExistsException;
 import com.sentysingh.patient_service.mapper.PatientMapper;
 import com.sentysingh.patient_service.model.Patient;
 import com.sentysingh.patient_service.dto.PatientResponseDTO;
@@ -27,8 +28,11 @@ public class PatientService {
     }
 
     // service layer passing model to repository after converting DTO to model
-    public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO) {
-        Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
-        return PatientMapper.toDTO(newPatient);
+    public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO) throws EmailAlreadyExistsException {
+        if(!patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
+            Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
+            return PatientMapper.toDTO(newPatient);
+        }
+        throw new EmailAlreadyExistsException("A patient already exists in the system with following email " + patientRequestDTO.getEmail() + " !");
     }
 }
