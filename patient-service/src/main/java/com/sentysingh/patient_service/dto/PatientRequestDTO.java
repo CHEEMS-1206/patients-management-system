@@ -1,5 +1,6 @@
 package com.sentysingh.patient_service.dto;
 
+import com.sentysingh.patient_service.dto.validators.CreatePatientValidationGroup;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +18,8 @@ public class PatientRequestDTO {
     @NotBlank(message = "Address field can not be blank !")
     private String address;
 
-    @NotBlank(message = "Registered date is required !")
+    // not to default class but a separate implementation -> CreatePatientValidationGroup, rest other properties are in default class
+    @NotBlank(groups = CreatePatientValidationGroup.class, message = "Registered date is required !")
     private String registeredDate;
 
     @NotBlank(message = "Birth date is required !")
