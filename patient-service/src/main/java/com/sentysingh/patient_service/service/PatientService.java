@@ -53,4 +53,9 @@ public class PatientService {
         }
         throw new EmailAlreadyExistsException("A patient already exists in the system with following email " + patientRequestDTO.getEmail() + " !");
     }
+
+    // delete patients
+    public void deletePatient (UUID id){
+        patientRepository.deleteById(id);
+    }
 }
