@@ -9,4 +9,5 @@ import java.util.UUID;
 // just by extending it to Jparespository we have all cruds available to us
 @Repository
 public interface PatientRepository extends JpaRepository <Patient, UUID> {
+    boolean existsByEmail(String email);
 }
