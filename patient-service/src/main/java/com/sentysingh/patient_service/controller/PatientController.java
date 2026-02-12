@@ -2,12 +2,17 @@ package com.sentysingh.patient_service.controller;
 
 import com.sentysingh.patient_service.dto.PatientRequestDTO;
 import com.sentysingh.patient_service.dto.PatientResponseDTO;
+import com.sentysingh.patient_service.dto.validators.CreatePatientValidationGroup;
 import com.sentysingh.patient_service.service.PatientService;
 import jakarta.validation.Valid;
+import jakarta.validation.groups.Default;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/patients")
@@ -27,8 +32,17 @@ public class PatientController {
 
     // post mapping to add new patient
     @PostMapping
-    public ResponseEntity<PatientResponseDTO> createPatient(@Valid @RequestBody PatientRequestDTO patientRequestDTO){
+    // using @validated to validate all points that are in default validation class and the CreatePatientValidationGroup class as well, so that we can validate registered date as well
+    public ResponseEntity<PatientResponseDTO> createPatient(@Validated({Default.class, CreatePatientValidationGroup.class}) @RequestBody PatientRequestDTO patientRequestDTO){
         PatientResponseDTO patientResponseDTO = patientService.createPatient(patientRequestDTO);
+        return ResponseEntity.ok().body(patientResponseDTO);
+    }
+
+    // update patient details
+    @PutMapping("/{id}")
+    // we do not need to validate registered date hence not used -> CreatePatientValidationGroup
+    public ResponseEntity<PatientResponseDTO> updatePatient(@PathVariable UUID id, @Validated({Default.class}) @RequestBody PatientRequestDTO patientRequestDTO){
+        PatientResponseDTO patientResponseDTO = patientService.updatePatient(id,patientRequestDTO);
         return ResponseEntity.ok().body(patientResponseDTO);
     }
 }
