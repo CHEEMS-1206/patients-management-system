@@ -3,6 +3,7 @@ package com.sentysingh.patient_service.service;
 import com.sentysingh.patient_service.dto.PatientRequestDTO;
 import com.sentysingh.patient_service.exception.EmailAlreadyExistsException;
 import com.sentysingh.patient_service.exception.PatientNotFoundException;
+import com.sentysingh.patient_service.grpc.BillingServiceGrpcClient;
 import com.sentysingh.patient_service.mapper.PatientMapper;
 import com.sentysingh.patient_service.model.Patient;
 import com.sentysingh.patient_service.dto.PatientResponseDTO;
@@ -16,9 +17,11 @@ import java.util.UUID;
 @Service
 public class PatientService {
     private PatientRepository patientRepository;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
     // constructor injection
-    public PatientService(PatientRepository patientRepository){
+    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient){
         this.patientRepository = patientRepository;
+        this.billingServiceGrpcClient = billingServiceGrpcClient;
     }
 
     // service layer passing DTO to controller after converting model to DTO
@@ -33,7 +36,11 @@ public class PatientService {
     // service layer passing model to repository after converting DTO to model
     public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO) throws EmailAlreadyExistsException {
         if(!patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
+
+            // creating a billing account once patient is created using GRPC
             Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
+            billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),newPatient.getName(),newPatient.getEmail());
+
             return PatientMapper.toDTO(newPatient);
         }
         throw new EmailAlreadyExistsException("A patient already exists in the system with following email " + patientRequestDTO.getEmail() + " !");
