@@ -3,6 +3,7 @@ package com.sentysingh.auth_service.service;
 import com.sentysingh.auth_service.dto.LoginRequestDTO;
 import com.sentysingh.auth_service.model.User;
 import com.sentysingh.auth_service.util.JwtUtil;
+import io.jsonwebtoken.JwtException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,5 +27,14 @@ public class AuthService {
                 .map(u-> jwtUtil.generateToken(u.getEmail(), u.getRole()));
 
         return userJWTtoken;
+    }
+
+    public boolean validateToken(String token){
+        try{
+            jwtUtil.validateToken(token);
+            return true;
+        }catch (JwtException e){
+            return false;
+        }
     }
 }
