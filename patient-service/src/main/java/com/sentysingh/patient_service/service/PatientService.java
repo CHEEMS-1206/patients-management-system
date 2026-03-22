@@ -4,6 +4,7 @@ import com.sentysingh.patient_service.dto.PatientRequestDTO;
 import com.sentysingh.patient_service.exception.EmailAlreadyExistsException;
 import com.sentysingh.patient_service.exception.PatientNotFoundException;
 import com.sentysingh.patient_service.grpc.BillingServiceGrpcClient;
+import com.sentysingh.patient_service.kafka.KafkaProducer;
 import com.sentysingh.patient_service.mapper.PatientMapper;
 import com.sentysingh.patient_service.model.Patient;
 import com.sentysingh.patient_service.dto.PatientResponseDTO;
@@ -18,10 +19,12 @@ import java.util.UUID;
 public class PatientService {
     private PatientRepository patientRepository;
     private final BillingServiceGrpcClient billingServiceGrpcClient;
+    private final KafkaProducer kafkaProducer;
     // constructor injection
-    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient){
+    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient, KafkaProducer kafkaProducer){
         this.patientRepository = patientRepository;
         this.billingServiceGrpcClient = billingServiceGrpcClient;
+        this.kafkaProducer = kafkaProducer;
     }
 
     // service layer passing DTO to controller after converting model to DTO
@@ -40,7 +43,8 @@ public class PatientService {
             // creating a billing account once patient is created using GRPC
             Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
             billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),newPatient.getName(),newPatient.getEmail());
-
+            // sending a kafka message once a patient is created
+            kafkaProducer.sendEvent(newPatient);
             return PatientMapper.toDTO(newPatient);
         }
         throw new EmailAlreadyExistsException("A patient already exists in the system with following email " + patientRequestDTO.getEmail() + " !");
